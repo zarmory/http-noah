@@ -3,6 +3,7 @@ import logging
 import unittest
 
 import structlog
+
 from http_noah.async_client import AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
 from http_noah.common import ClientOptions, FormData, JSONData, Timeout
 

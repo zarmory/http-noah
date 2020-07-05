@@ -21,7 +21,7 @@ repos:
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v4.3.21
+    rev: v5.0.3
     hooks:
       - id: isort
         additional_dependencies: ["toml"]  # To parse our pyproject.toml
