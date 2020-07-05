@@ -4,7 +4,7 @@ import unittest
 
 import structlog
 
-from http_noah.async_client import AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
+from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
 from http_noah.common import ClientOptions, FormData, JSONData, Timeout
 
 from .common import TestClientBase, get_free_port
@@ -133,3 +133,16 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
                     await client.get("/")
         finally:
             sock.close()
+
+    async def test_hl_client(self) -> None:
+        client = AsyncHTTPClient("localhost", self.server.port)
+        logger.info(client.session)
+        async with PetClient(client=client) as pets:
+            await pets.list()
+
+        self.assertTrue(pets.client.session.closed)
+
+
+class PetClient(AsyncAPIClientBase):
+    async def list(self) -> Pets:
+        return await self.client.get("/pets", response_type=Pets)

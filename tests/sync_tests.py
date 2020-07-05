@@ -1,9 +1,10 @@
 import logging
+from unittest.mock import MagicMock
 
 import structlog
 
 from http_noah.common import ClientOptions, FormData, JSONData, Timeout
-from http_noah.sync_client import ConnectionError, HTTPError, SyncHTTPClient, TimeoutError
+from http_noah.sync_client import ConnectionError, HTTPError, SyncAPIClientBase, SyncHTTPClient, TimeoutError
 
 from .common import TestClientBase, get_free_port
 from .models import Pet, Pets
@@ -128,3 +129,15 @@ class TestSyncClient(TestClientBase):
                 client.get("/")
         finally:
             sock.close()
+
+    def test_hl_client(self) -> None:
+        with PetClient(client=self.client) as pets:
+            pets.client.session.close = MagicMock(side_efect=pets.client.session.close)
+            pets.list()
+
+        pets.client.session.close.assert_called()
+
+
+class PetClient(SyncAPIClientBase):
+    def list(self) -> Pets:
+        return self.client.get("/pets", response_type=Pets)

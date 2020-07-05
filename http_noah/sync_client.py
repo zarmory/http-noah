@@ -53,7 +53,7 @@ class SyncHTTPClient:
     def set_token(self, token: str) -> None:
         self.session.headers["Authorization"] = f"Bearer {token}"
 
-    async def close(self) -> None:
+    def close(self) -> None:
         self.session.close()
 
     def __enter__(self) -> SyncHTTPClient:
@@ -249,7 +249,7 @@ class SyncAPIClientBase:
 
     client: SyncHTTPClient
 
-    async def close(self) -> None:
+    def close(self) -> None:
         self.client.close()
 
     def __enter__(self) -> SyncAPIClientBase:
