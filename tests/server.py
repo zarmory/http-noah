@@ -29,6 +29,16 @@ async def get_int(request: web.Request):
     return web.Response(text="1")
 
 
+@routes.get("/api/v1/json_int")
+async def get_json_int(request: web.Request):
+    return web.json_response(1)
+
+
+@routes.get("/api/v1/json_str")
+async def get_json_str(request: web.Request):
+    return web.json_response("boo")
+
+
 @routes.delete("/api/v1/pets/1")
 async def delete_pet(request: web.Request):
     return web.Response(status=HTTPStatus.NO_CONTENT)

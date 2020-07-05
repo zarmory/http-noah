@@ -23,8 +23,9 @@ logger = structlog.get_logger(__name__)
 # V Conn Error
 # V Conn timeout
 # V timeouts ctxmgr
+# V High level client? (Check ctxmgr warnings, etc.?)
 #
-# High level client? (Check ctxmgr warnings, etc.?)
+# Support disabling SSL validation
 
 
 class TestSyncClient(TestClientBase):
@@ -43,6 +44,14 @@ class TestSyncClient(TestClientBase):
     def test_get_int(self) -> None:
         with self.assertRaises(TypeError):
             self.client.get("/int", response_type=int)
+
+    def test_get_json_str(self) -> None:
+        s = self.client.get("/json_str", response_type=str)
+        self.assertEqual(s, "boo")
+
+    def test_get_json_int(self) -> None:
+        i = self.client.get("/json_int", response_type=int)
+        self.assertEqual(i, 1)
 
     def test_get_list(self) -> None:
         pets = self.client.get("/pets", response_type=list)

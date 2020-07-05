@@ -34,6 +34,16 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(TypeError):
                 await client.get("/int", response_type=int)
 
+    async def test_get_json_str(self) -> None:
+        async with AsyncHTTPClient("localhost", self.server.port) as client:
+            s = await client.get("/json_str", response_type=str)
+            self.assertEqual(s, "boo")
+
+    async def test_get_json_int(self) -> None:
+        async with AsyncHTTPClient("localhost", self.server.port) as client:
+            i = await client.get("/json_int", response_type=int)
+            self.assertEqual(i, 1)
+
     async def test_get_list(self) -> None:
         async with AsyncHTTPClient("localhost", self.server.port) as client:
             pets = await client.get("/pets", response_type=list)
