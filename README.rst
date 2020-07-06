@@ -15,7 +15,7 @@ HTTP Noah
 "Noah" means "convenient" in Hebrew.
 Generic HTTP client for sync (requests) and async (aiohttp) operations.
 
-It support Python 3.8+ only. Please open an issue if you need support for earlier options.
+For now I support Python 3.8+ only. Please open an issue if you need support for earlier options.
 
 **********
 Motivation
