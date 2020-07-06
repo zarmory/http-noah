@@ -12,7 +12,7 @@ with open("LICENSE") as f:
 setup(
     name="http-noah",
     version="0.1.1",
-    description="Generic HTTP client for sync (requests) and async (aiohttp) operations",
+    description="REST-minded yet generic HTTP Python client with both async and sync interfaces",
     long_description=readme,
     author="Zaar Hai",
     author_email="haizaar@haizaar.com",
