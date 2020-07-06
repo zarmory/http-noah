@@ -2,14 +2,14 @@
 HTTP Noah
 #########
 
-.. image:: https://img.shields.io/pypi/v/check-pipfile-lock.svg
-    :target: https://pypi.python.org/pypi/check-pipfile-lock
+.. image:: https://img.shields.io/pypi/v/http-noah.svg
+    :target: https://pypi.python.org/pypi/http-noah
 
-.. image:: https://img.shields.io/travis/haizaar/check-pipfile-lock.svg
-        :target: https://travis-ci.org/haizaar/check-pipfile-lock
+.. image:: https://img.shields.io/travis/haizaar/http-noah.svg
+        :target: https://travis-ci.org/haizaar/http-noah
 
-.. image:: https://img.shields.io/pypi/dm/check-pipfile-lock.svg
-    :target: https://pypi.python.org/pypi/check-pipfile-lock
+.. image:: https://img.shields.io/pypi/dm/http-noah.svg
+    :target: https://pypi.python.org/pypi/http-noah
 
 
 "Noah" means "convenient" in Hebrew.
