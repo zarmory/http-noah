@@ -9,7 +9,7 @@ with open("LICENSE") as f:
 
 setup(
     name="http-noah",
-    version="0.0.0",
+    version="0.1.0",
     description="Generic HTTP client for sync (requests) and async (aiohttp) operations",
     long_description=readme,
     author="Zaar Hai",
