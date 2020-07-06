@@ -2,6 +2,16 @@
 HTTP Noah
 #########
 
+.. image:: https://img.shields.io/pypi/v/check-pipfile-lock.svg
+    :target: https://pypi.python.org/pypi/check-pipfile-lock
+
+.. image:: https://img.shields.io/travis/haizaar/check-pipfile-lock.svg
+        :target: https://travis-ci.org/haizaar/check-pipfile-lock
+
+.. image:: https://img.shields.io/pypi/dm/check-pipfile-lock.svg
+    :target: https://pypi.python.org/pypi/check-pipfile-lock
+
+
 "Noah" means "convenient" in Hebrew.
 Generic HTTP client for sync (requests) and async (aiohttp) operations.
 
