@@ -11,7 +11,7 @@ with open("LICENSE") as f:
 
 setup(
     name="http-noah",
-    version="0.1.1",
+    version="0.1.2",
     description="REST-minded yet generic HTTP Python client with both async and sync interfaces",
     long_description=readme,
     author="Zaar Hai",
