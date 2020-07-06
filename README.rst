@@ -2,8 +2,8 @@
 HTTP Noah
 #########
 
-"Noah" mean convenient in Hebrew.
-Generic HTTP client for for sync (requests) and async (aiohttp) operations.
+"Noah" means "convenient" in Hebrew.
+Generic HTTP client for sync (requests) and async (aiohttp) operations.
 
 **********
 Motivation
@@ -73,9 +73,9 @@ which we would then hierarchically plug into the main?  I believe the below is m
   psc.cares.list(...)
   ...
 
-I hope this give you an idea why this project was born. Throw into the equation support for asyncio and
+I hope this gives you an idea of why this project was born. Throw into the equation support for asyncio and
 numerous corner cases like forming URLs, aiohttp releasing connection on ``.raise_for_status()`` invocation and hence
-denying you from seeing the error body which quite often contains a valuable information, etc.
+denying you from seeing the error body which quite often contains  valuable information, etc.
 
 All this particularly started to make sense when I switched to using
 `FastAPI <https://fastapi.tiangolo.com/>`_ for my backend services and already had Pydantic
@@ -119,14 +119,14 @@ Assuming our Pet Sanctuary API is running on ``http://localhost:8080/api/v1``:
       with SyncHTTPClient("localhost", 8080) as client:
           pet: Pet = client.get("/pets/1", response_type=Pet)
 
-Let's have a closer looks on what happened here:
+Let's have a closer looks at what happened here:
 
 * We provided only ``host`` and ``port`` with ``api_base`` defaulting to ``/api/v1`` so that
   we don't have to prepend it to every URL in our call
-* We ask http_noah to covert API response to instance of the desired type (or raise
+* We ask http_noah to convert API response to an instance of the desired type (or raise
   otherwise)
-* We used a context manager to make sure everything will be cleaned up in a timely manner.
-  In a more complex code you may consider a kind of a life-cycle manager e.g. like in my demo
+* We used a context manager to make sure everything will be cleaned up promptly.
+  In a more complex code, you may consider a kind of a life-cycle manager e.g. like in my demo
   Hanuka project (`source <https://github.com/haizaar/hanuka/blob/master/hanuka/main.py#L36>`_)
 
 Async example is pretty much the same:
@@ -141,7 +141,7 @@ Async example is pretty much the same:
 
 Since the goal of this library is to provide similar interfaces for both sync and async
 code I'll focus on *async* examples from now on and will be leaving notes if there are
-differences which I worked hard to reduce to a very few.
+differences that I worked hard to reduce to a very few.
 
 The client support the following methods that map the corresponding HTTP verbs:
 
@@ -179,7 +179,7 @@ as JSON or as Form which both can be Python dicts. See more on forms and file up
 in the dedicated section below.
 
 Again, I prefer to model everything I send and receive with Pydantic models - it makes
-life so much easer that you get addicted to it very fast.
+life so much easier that you get addicted to it very fast.
 
 Nested Clients
 ##############
@@ -262,16 +262,16 @@ HTTP 204 "No Content" which generally makes sense for DELETE operations.
 * If response Content-Type heading is set to ``applicaiton/json`` then JSON data will be
   decoded for you and can be further parsed using `Pydantic <https://pydantic-docs.helpmanual.io/>`_
   model of your choice.
-* Otherwise you can request back either ``str`` or ``bytes``
+* Otherwise, you can request back either ``str`` or ``bytes``
 
 This results in a limitation where with this library you can't fetch JSON response back
-as string. But since this is a high level REST client I've yet bumped into this limitation
+as string. But since this is a high-level REST client I've yet bumped into this limitation
 in practice.
 
 To sum it up, here are your options for the ``response_type`` argument:
 
-* ``bytes`` when request returns a binary data, e.g image
-* ``str`` when request returns text (technically speaking "when content type is not ``application/json``")
+* ``bytes`` when a request returns a binary data, e.g image
+* ``str`` when a request returns text (technically speaking "when the content type is not ``application/json``")
 * ``dict``, ``list``, ``int``, ``bool``, ``float``, ``str`` (i.e. any of the JSON -> Python native types),
   when your request returns JSON data and you don't want it parsed further into Pydantic objects.
 
@@ -282,11 +282,11 @@ common names ``ConnectionError``, ``HTTPError``, and ``TimeoutError`` in both
 ``http_noah.sync_client`` and ``async_client``. This is where it stops though - behind the
 name these are still ``requests`` / ``aiohttp`` error classes if you want to dig deeper.
 
-One useful thing that http_noah does for you is making sure to log HTTP body when error occurs.
-This is usually small but vital piece of information to help you understand what's going
+One useful thing that http_noah does for you is making sure to log HTTP body when the error occurs.
+This is usually a small but vital piece of information to help you understand what's going
 on. Sadly enough, it requires quite a bit of tinkering to dig this info out.
 Just one example is that calling aiohttp's response object ``raise_for_status()`` method
-will actually return underlying HTTP connection back to the pool depriving you from reading
+will actually return the underlying HTTP connection back to the pool depriving you of reading
 the error body.
 
 Again, http_noah will log HTTP (error) body when it encounters HTTP errors.
@@ -307,7 +307,7 @@ either ``.get()``, ``put()``, etc. methods or setting it per client instance thr
       await client.get(...)  # Limited to 10 seconds
       await client.post(..., timeout=Timeout(total=20))  # per call override
 
-However if you reflect on nested client approach as was suggested earlier, you can quickly notice
+However, if you reflect on the nested client approach as was suggested earlier, you can quickly notice
 that re-defining ``timeout`` argument in all your high-level methods is very onerous.
 Fortunately, http_noah stands true to its name and provides an easy solution with
 the help of ``timeout`` context manager that both sync and async client implements:
@@ -336,7 +336,7 @@ logic yet we can perfectly apply timeouts.
 
 Forms and Files
 ===============
-Forms are not used much today. However I still encounter them when I need to login
+Forms are not used much today. However, I still encounter them when I need to login
 into API to get Bearer token.
 
 To use a form with http_noah simply fill it up as a ``dict``, as you would with
