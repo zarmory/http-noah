@@ -5,6 +5,8 @@ HTTP Noah
 "Noah" means "convenient" in Hebrew.
 Generic HTTP client for sync (requests) and async (aiohttp) operations.
 
+It support Python 3.8+ only. Please open an issue if you need support for earlier options.
+
 **********
 Motivation
 **********
@@ -377,10 +379,18 @@ done through ``ClientOptions``:
       ...
 
 
-
 ***********
 Development
 ***********
-sync vs async
-`Direnv <https://direnv.net/>`_  makes like easier. Get it installed and then run ``make boostrap``
-(well, I do assume that you have ``make`` and Python installed).
+To develop http_noah you'll need Python 3.8+, pipenv and `direnv <https://direnv.net/>`_ installed.
+
+Then just run ``make boostrap`` after cloning the repo, wait a while, and you are done - next time you enter into the
+cloned directory the environment will be set for you.
+
+Code wise, you can't really have the same code that does both sync and async. Not in a readable way at least.
+Since readability counts and simplicity trumps complexity, I'd rather have two versions of a very simple code
+that does each of sync and async instead of one callback-polluted/iterator-based/black-magic-imbued code-base.
+
+Care was takes to have a functional tests for each of the library features.
+
+Enjoys and see you at PRs!
