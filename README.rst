@@ -2,8 +2,7 @@
 HTTP Noah
 #########
 
-.. image:: https://img.shields.io/pypi/v/http-noah.svg
-    :target: https://pypi.python.org/pypi/http-noah
+.. image:: https://github.com/haizaar/http-noah/workflows/Python%20application/badge.svg
 
 .. image:: https://img.shields.io/travis/haizaar/http-noah.svg
         :target: https://travis-ci.org/haizaar/http-noah
