@@ -6,6 +6,10 @@ release: test
 	git push
 	git push --tags
 
+.PHONY: upload
+upload:
+	./setup.py sdist upload
+
 .PHONY: restview
 restview:
 	restview README.rst -w README.rst
