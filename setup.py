@@ -1,9 +1,21 @@
 from setuptools import find_packages, setup
 
+with open("README.rst") as f:
+    readme = f.read()
+
+with open("LICENSE") as f:
+    license = f.read()
+
+
 setup(
     name="http-noah",
     version="0.0.0",
+    description="Generic HTTP client for sync (requests) and async (aiohttp) operations",
+    long_description=readme,
+    author="Zaar Hai",
+    author_email="haizaar@haizaar.com",
     url="https://github.com/haizaar/http-noah",
+    license=license,
     packages=find_packages(),
     install_requires=[
         "structlog",
@@ -14,4 +26,12 @@ setup(
         "sync": ["requests"],
         "all": ["aiohttp", "requests"],
     },
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
+    ],
 )
