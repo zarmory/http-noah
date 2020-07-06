@@ -404,4 +404,4 @@ that does each of sync and async instead of one callback-polluted/iterator-based
 
 Care was takes to have a functional tests for each of the library features.
 
-Enjoys and see you at PRs!
+Enjoy and see you at PRs!
