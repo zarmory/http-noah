@@ -28,4 +28,5 @@ jobs:
         pipenv install --dev
     - name: Test it!
       run: |
+        pipenv sync --dev
         pipenv run make test
