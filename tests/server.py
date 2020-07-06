@@ -1,9 +1,13 @@
 # Using aiohttp server part since it already comes as part of aiohttp
-
 import asyncio
 import socket
+import ssl
+import subprocess
 from dataclasses import dataclass, field
 from http import HTTPStatus
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import Optional
 
 import structlog
 from aiohttp import web
@@ -121,12 +125,12 @@ class Server:
         self.sock.bind(("localhost", 0))
         _, self.port = self.sock.getsockname()
 
-    async def start(self) -> None:
+    async def start(self, ssl_context: Optional[ssl.SSLContext] = None) -> None:
         app = web.Application()
         app.add_routes(routes)
         runner = web.AppRunner(app)
         await runner.setup()
-        self.site = web.SockSite(runner=runner, sock=self.sock)
+        self.site = web.SockSite(runner=runner, sock=self.sock, ssl_context=ssl_context)
         await self.site.start()
         logger.info("Server is up", port=self.port)
 
@@ -134,3 +138,32 @@ class Server:
         await self.site.stop()
         logger.info("Server stopped")
         self.sock.close()
+
+
+@dataclass
+class SSLServer(Server):
+    cert_file: NamedTemporaryFile = field(init=False, repr=False)
+
+    def __post_init__(self) -> None:
+        super().__post_init__()
+        self.cert_file = NamedTemporaryFile()
+        self._gen_cert(self.cert_file.name)
+
+    def _gen_cert(self, path: Path) -> None:
+        subprocess.run(
+            f"openssl req -new -x509 -days 365 -nodes -out {path} -keyout {path}"
+            + " -subj '/C=AU/ST=VIC/O=ACME/CN=example.com'",
+            shell=True,
+            check=True,
+            capture_output=True,
+        )
+        logger.info("Generated x509 key/cert", path=path)
+
+    async def start(self) -> None:
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_context.load_cert_chain(self.cert_file.name)
+        return await super().start(ssl_context)
+
+    async def stop(self) -> None:
+        self.cert_file.close()
+        await super().stop()

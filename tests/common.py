@@ -8,13 +8,14 @@ from typing import Tuple
 import structlog
 import uberlogging
 
-from .server import Server
+from .server import Server, SSLServer
 
 logger = structlog.get_logger(__name__)
 uberlogging.configure(root_level=logging.DEBUG)  # A bit ugly but very convenient
 
 
 class TestClientBase(unittest.TestCase):
+    server_class: Server = Server
     server: Server = None
     should_exit: bool = False
     server_thread: threading.Thread = None
@@ -23,7 +24,7 @@ class TestClientBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         logger.info("Class setup")
-        cls.server = Server()
+        cls.server = cls.server_class()
         when_ready = threading.Event()
         cls.server_thread = threading.Thread(target=asyncio.run, args=(cls.run_async_server(when_ready),))
         cls.server_thread.setDaemon(True)
@@ -46,6 +47,15 @@ class TestClientBase(unittest.TestCase):
     def run(self, result=None):
         logger.info("Testing %s", self.id())
         return super().run(result=result)
+
+    async def asyncSetUp(self) -> None:
+        # IsolatedAsyncioTestCase sets set the loop to debug
+        # which creates too much noise and is unconfigurable
+        asyncio.get_running_loop().set_debug(False)
+
+
+class TestSSLClientBase(TestClientBase):
+    server_class: Server = SSLServer
 
 
 def get_free_port() -> Tuple[socket.socket, int]:

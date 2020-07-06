@@ -1,24 +1,19 @@
-import asyncio
 import logging
 import unittest
 
+import aiohttp
 import structlog
 
 from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
 from http_noah.common import ClientOptions, FormData, JSONData, Timeout
 
-from .common import TestClientBase, get_free_port
+from .common import TestClientBase, TestSSLClientBase, get_free_port
 from .models import Pet, Pets
 
 logger = structlog.get_logger(__name__)
 
 
 class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self) -> None:
-        # IsolatedAsyncioTestCase sets created loops to debug which creates too much
-        # noise and is unconfigurable
-        asyncio.get_running_loop().set_debug(False)
-
     async def test_get_str(self) -> None:
         async with AsyncHTTPClient("localhost", self.server.port) as client:
             s = await client.get("/str", response_type=str)
@@ -151,6 +146,19 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
             await pets.list()
 
         self.assertTrue(pets.client.session.closed)
+
+
+class TestAsyncSSLClient(TestSSLClientBase, unittest.IsolatedAsyncioTestCase):
+    async def test_disable_ssl_validation(self):
+        options = ClientOptions(ssl_verify_cert=False)
+        async with AsyncHTTPClient("localhost", self.server.port, scheme="https", options=options) as client:
+            s = await client.get("/str", response_type=str)
+            self.assertEqual(s, "boo")
+
+    async def test_requires_ssl_validation(self):
+        async with AsyncHTTPClient("localhost", self.server.port, scheme="https") as client:
+            with self.assertRaises(aiohttp.client_exceptions.ClientConnectorCertificateError):
+                await client.get("/str", response_type=str)
 
 
 class PetClient(AsyncAPIClientBase):

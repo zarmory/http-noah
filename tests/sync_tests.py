@@ -1,31 +1,17 @@
 import logging
 from unittest.mock import MagicMock
 
+import requests
 import structlog
+from urllib3.exceptions import InsecureRequestWarning
 
 from http_noah.common import ClientOptions, FormData, JSONData, Timeout
 from http_noah.sync_client import ConnectionError, HTTPError, SyncAPIClientBase, SyncHTTPClient, TimeoutError
 
-from .common import TestClientBase, get_free_port
+from .common import TestClientBase, TestSSLClientBase, get_free_port
 from .models import Pet, Pets
 
 logger = structlog.get_logger(__name__)
-
-# V Get str, int, bytes
-# V Get dict, list
-# V Get model, custom root
-# V Delete / Reponse None (204)
-# V Submit model put/post
-# V Submit JSON (dict) put/post
-# V Submit form (dict) post
-# V Client error => check body
-# V Read timeout
-# V Conn Error
-# V Conn timeout
-# V timeouts ctxmgr
-# V High level client? (Check ctxmgr warnings, etc.?)
-#
-# Support disabling SSL validation
 
 
 class TestSyncClient(TestClientBase):
@@ -145,6 +131,20 @@ class TestSyncClient(TestClientBase):
             pets.list()
 
         pets.client.session.close.assert_called()
+
+
+class TestSyncSSLClient(TestSSLClientBase):
+    def test_disable_ssl_validation(self):
+        options = ClientOptions(ssl_verify_cert=False)
+        client = SyncHTTPClient("localhost", self.server.port, scheme="https", options=options)
+        with self.assertWarns(InsecureRequestWarning):
+            s = client.get("/str", response_type=str)
+        self.assertEqual(s, "boo")
+
+    def test_requires_ssl_validation(self):
+        with SyncHTTPClient("localhost", self.server.port, scheme="https") as client:
+            with self.assertRaises(requests.exceptions.SSLError):
+                client.get("/str", response_type=str)
 
 
 class PetClient(SyncAPIClientBase):
