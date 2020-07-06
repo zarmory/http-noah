@@ -12,7 +12,7 @@ restview:
 
 .PHONY: test
 test:
-	nosetests -v --nologcapture tests
+	nosetests --nocapture --nologcapture tests
 	python setup.py checkdocs
 	pre-commit run --all-files
 
