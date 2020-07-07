@@ -114,6 +114,12 @@ async def delete_slow_pet(request: web.Request):
     return web.json_response(Pet(name="slow").dict())
 
 
+@routes.post("/api/v1/pets/1/photo")
+async def set_pet_photo(request: web.Request):
+    data = await request.post()
+    return web.Response(text=data["photo"].file.read().decode())
+
+
 @dataclass
 class Server:
     port: int = field(init=False)

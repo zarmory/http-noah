@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import mimetypes
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from http import HTTPStatus
 from types import TracebackType
-from typing import Any, Callable, Dict, Generator, Optional, Type
+from typing import Any, Callable, Dict, Generator, Optional, Type, cast
 
 import requests
 import structlog
@@ -183,7 +184,7 @@ class SyncHTTPClient:
         req_kwargs["params"] = query_params
 
         if isinstance(body, UploadFile):
-            req_kwargs["files"] = body.prepare()
+            req_kwargs.update(self._body_to_upload_args(cast(UploadFile, body)))
         else:
             req_kwargs.update(c.body_to_payload_args(body))
 
@@ -213,6 +214,26 @@ class SyncHTTPClient:
                 data = res.text
 
             return c.parse_response_data(data, response_type)
+
+    def _body_to_upload_args(self, upload: UploadFile) -> dict:
+        # requests doesn't guess content-type for form file elements while
+        # aiohttp does.  Consequently some servers, e.g. aiohttp, will parse
+        # this form field  just as a string and not as a file which results
+        # in a different behavious between aiohttp and requests file uploads.
+        #
+        # Retrofiting aiohttp behaviour to requests
+
+        files = upload.prepare()
+        fp = files[upload.name]
+
+        mimetype, encoding = mimetypes.guess_type(upload.path)
+        mimetype = mimetype or upload.default_mimetype
+        if encoding:
+            mimetype = "; ".join(mimetype, encoding)
+
+        files[upload.name] = (upload.path.name, fp, mimetype)
+
+        return {"files": files}
 
     def _convert_options(self, options: Optional[ClientOptions] = None) -> dict:
         kwargs: Dict[str, Any] = {}

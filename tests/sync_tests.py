@@ -1,11 +1,12 @@
 import logging
+from tempfile import NamedTemporaryFile
 from unittest.mock import MagicMock
 
 import requests
 import structlog
 from urllib3.exceptions import InsecureRequestWarning
 
-from http_noah.common import ClientOptions, FormData, JSONData, Timeout
+from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
 from http_noah.sync_client import ConnectionError, HTTPError, SyncAPIClientBase, SyncHTTPClient, TimeoutError
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
@@ -131,6 +132,15 @@ class TestSyncClient(TestClientBase):
             pets.list()
 
         pets.client.session.close.assert_called()
+
+    def test_file_upload(self) -> None:
+        content = b"Hello Noah"
+        with NamedTemporaryFile() as tmpfile:
+            tmpfile.write(content)
+            tmpfile.flush()
+            upload = UploadFile(name="photo", path=tmpfile.name)
+            b = self.client.post("/pets/1/photo", body=upload, response_type=bytes)
+            self.assertEqual(b, content)
 
 
 class TestSyncSSLClient(TestSSLClientBase):

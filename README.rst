@@ -347,8 +347,8 @@ logic yet we can perfectly apply timeouts.
   See ``test_connect_timeout`` tests under ``tests/async_tests.py`` and
   ``tests/sync_tests.py`` for details.
 
-Forms and Files
-===============
+Forms
+=====
 Forms are not used much today. However, I still encounter them when I need to login
 into API to get Bearer token.
 
@@ -373,6 +373,23 @@ aiohttp / requests, and pass it through ``body`` argument wrapped with ``FormDat
       })
       async with AsyncHTTPClient("localhost", 8080) as client:
           tr = await client.post("/access_token", body=login_form, response_type=TokenResponse)
+
+Files
+=====
+http-noah provides simple means to upload a file as a multipart encoded form.
+Best illustrated by example:
+
+.. code-block:: python
+
+  from pathlib import Path
+
+  from http_noah.common import UploadFile
+
+  async with AsyncHTTPClient("localhost", 8080) as client:
+      await client.post(
+          "/pets/1/photo",
+          body=UploadFile(name="thumbnail", path=Path("myphoto.jpg"),
+      )
 
 SSL
 ===

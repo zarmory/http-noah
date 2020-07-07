@@ -1,11 +1,12 @@
 import logging
 import unittest
+from tempfile import NamedTemporaryFile
 
 import aiohttp
 import structlog
 
 from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
-from http_noah.common import ClientOptions, FormData, JSONData, Timeout
+from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
 from .models import Pet, Pets
@@ -146,6 +147,16 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
             await pets.list()
 
         self.assertTrue(pets.client.session.closed)
+
+    async def test_file_upload(self) -> None:
+        content = b"Hello Noah"
+        with NamedTemporaryFile() as tmpfile:
+            tmpfile.write(content)
+            tmpfile.flush()
+            upload = UploadFile(name="photo", path=tmpfile.name)
+            async with AsyncHTTPClient("localhost", self.server.port) as client:
+                b = await client.post("/pets/1/photo", body=upload, response_type=bytes)
+                self.assertEqual(b, content)
 
 
 class TestAsyncSSLClient(TestSSLClientBase, unittest.IsolatedAsyncioTestCase):
