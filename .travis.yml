@@ -7,10 +7,10 @@ install:
 
 jobs:
   include:
-    - stage: style-and-docs
+    - stage: Style and Docs
       script: make test-style test-docs
       python: "3.8"
 
-    - stage: python-test
-      script: make python-test
+    - stage: Functonal tests
+      script: make test-python
       python: "3.8"
