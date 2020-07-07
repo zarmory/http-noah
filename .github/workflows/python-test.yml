@@ -29,4 +29,5 @@ jobs:
     - name: Test it!
       run: |
         pipenv sync --dev
+        pip install -e .
         pipenv run make test
