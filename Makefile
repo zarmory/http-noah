@@ -14,11 +14,20 @@ upload:
 restview:
 	restview README.rst -w README.rst
 
-.PHONY: test
-test:
+.PHONY: test-python
+test-python:
 	nosetests --quiet --nocapture --nologcapture tests
-	python setup.py checkdocs
+
+.PHONY: test-style
+test-style:
 	pre-commit run --all-files
+
+.PHONY: test-docs
+test-docs:
+	python setup.py checkdocs
+
+.PHONY: test
+test: test-python test-style test-docs
 
 bootstrap:
 	ln -sf .envrc.tmpl .envrc

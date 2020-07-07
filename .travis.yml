@@ -1,0 +1,16 @@
+language: python
+
+install:
+  - pip install pipenv
+  - pipenv install --dev
+  - pip install -e .
+
+jobs:
+  include:
+    - stage: style-and-docs
+      script: make test-style test-docs
+      python: "3.8"
+
+    - stage: python-test
+      script: make python-test
+      python: "3.8"
