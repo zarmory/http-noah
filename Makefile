@@ -2,7 +2,7 @@ SHELL = /bin/bash
 
 .PHONY: release
 release: test
-	bump2version --verbose $${PART:-patch}
+	bump2version --verbose $${PART:-patch} --tag-message "Release {new_version}"
 	git push
 	git push --tags
 
