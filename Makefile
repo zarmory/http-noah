@@ -30,7 +30,7 @@ test-docs:
 test: test-python test-style test-docs
 
 bootstrap:
-	ln -sf .envrc.tmpl .envrc
+	ln -sf .envrc.linkme .envrc
 	direnv allow
 	pipenv install --dev
 	pipenv run pip install -e .
