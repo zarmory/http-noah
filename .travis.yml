@@ -2,7 +2,7 @@ language: python
 
 install:
   - pip install pipenv
-  - pipenv install --dev
+  - pipenv sync --dev
   - pip install -e .
 
 jobs:
