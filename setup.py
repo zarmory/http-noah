@@ -2,6 +2,9 @@
 
 from setuptools import find_packages, setup
 
+LICENSE = "LICENSE"
+README = "README.txt"
+
 with open("README.rst") as f:
     readme = f.read()
 
@@ -36,5 +39,5 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
     ],
-    data_files=[("", [license, readme])],
+    data_files=[("", [LICENSE, README])],
 )
