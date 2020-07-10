@@ -36,4 +36,5 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.8",
     ],
+    data_files=[("", [license, readme])],
 )
