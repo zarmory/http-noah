@@ -3,12 +3,12 @@
 from setuptools import find_packages, setup
 
 LICENSE = "LICENSE"
-README = "README.txt"
+README = "README.rst"
 
-with open("README.rst") as f:
+with open(README) as f:
     readme = f.read()
 
-with open("LICENSE") as f:
+with open(LICENSE) as f:
     license = f.read()
 
 
