@@ -203,6 +203,8 @@ Let's build a client for our hypothetical pet sanctuary API by starting with the
 
 .. code-block:: python
 
+  from __future__ import annotations
+
   from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient
 
   class PetSanctuaryClient(AsyncAPIClientBase):
@@ -217,6 +219,8 @@ a builder function. Note that I use ``AsyncAPIClientBase`` and not ``AsyncHTTPCl
 Now let's implement Pets sub-API:
 
 .. code-block:: python
+
+  from __future__ import annotations
 
   from dataclasses import dataclass
   from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient
