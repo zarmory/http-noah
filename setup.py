@@ -25,6 +25,7 @@ setup(
     install_requires=[
         "structlog",
         "pydantic",
+        "yarl",
     ],
     extras_require={
         "async": ["aiohttp"],
