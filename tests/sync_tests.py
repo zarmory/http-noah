@@ -24,6 +24,14 @@ class TestSyncClient(TestClientBase):
         s = self.client.get("/str", response_type=str)
         self.assertEqual(s, "boo")
 
+    def test_get_protected_str(self) -> None:
+        with SyncHTTPClient("localhost", self.server.port) as client:
+            with self.assertRaisesRegex(HTTPError, "Forbidden"):
+                s = client.get("/protected_str", response_type=str)
+            client.set_auth_token("let-the-bear-in")
+            s = client.get("/protected_str", response_type=str)
+            self.assertEqual(s, "you have made it through")
+
     def test_get_bytes(self) -> None:
         b = self.client.get("/bytes", response_type=bytes)
         self.assertEqual(b, b"bin-boo")

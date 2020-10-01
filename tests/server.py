@@ -23,6 +23,14 @@ async def get_str(request: web.Request):
     return web.Response(text="boo")
 
 
+@routes.get("/api/v1/protected_str")
+async def get_protected_str(request: web.Request):
+    logger.info(auth=request.headers.get("Authorization"))
+    if request.headers.get("authorization", "") != "Bearer let-the-bear-in":
+        raise web.HTTPForbidden()
+    return web.Response(text="you have made it through")
+
+
 @routes.get("/api/v1/bytes")
 async def get_bytes(request: web.Request):
     return web.Response(body=b"bin-boo")

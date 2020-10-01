@@ -20,6 +20,14 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
             s = await client.get("/str", response_type=str)
             self.assertEqual(s, "boo")
 
+    async def test_get_protected_str(self) -> None:
+        async with AsyncHTTPClient("localhost", self.server.port) as client:
+            with self.assertRaisesRegex(HTTPError, "Forbidden"):
+                s = await client.get("/protected_str", response_type=str)
+            client.set_auth_token("let-the-bear-in")
+            s = await client.get("/protected_str", response_type=str)
+            self.assertEqual(s, "you have made it through")
+
     async def test_get_bytes(self) -> None:
         async with AsyncHTTPClient("localhost", self.server.port) as client:
             b = await client.get("/bytes", response_type=bytes)

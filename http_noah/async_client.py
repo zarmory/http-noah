@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import warnings
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from http import HTTPStatus
@@ -52,9 +53,13 @@ class AsyncHTTPClient:
         self.session = aiohttp.ClientSession()
 
     def set_token(self, token: str) -> None:
+        warnings.warn("set_token() is deprectated in favour of set_auth_token()", DeprecationWarning)
+        self.set_auth_token(token)
+
+    def set_auth_token(self, token: str, type: str = "Bearer") -> None:
         # Using private member, but... otherwise we need
         # to duplicate exactly the same functionality in our code here
-        self.session._default_headers["Authorization"] = f"Bearer {token}"
+        self.session._default_headers["Authorization"] = f"{type} {token}"
 
     async def close(self) -> None:
         await self.session.close()

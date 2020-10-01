@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from http import HTTPStatus
 from types import TracebackType
 from typing import Any, Callable, Dict, Generator, Optional, Type, cast
+import warnings
 
 import requests
 import structlog
@@ -52,7 +53,11 @@ class SyncHTTPClient:
         self.session = requests.Session()
 
     def set_token(self, token: str) -> None:
-        self.session.headers["Authorization"] = f"Bearer {token}"
+        warnings.warn("set_token() is deprectated in favour of set_auth_token()", DeprecationWarning)
+        self.set_auth_token(token)
+
+    def set_auth_token(self, token: str, type: str = "Bearer") -> None:
+        self.session.headers["Authorization"] = f"{type} {token}"
 
     def close(self) -> None:
         self.session.close()
