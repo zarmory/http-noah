@@ -18,8 +18,6 @@ restview = "*"
 pygments = "*"
 mypy = "*"
 uberlogging = "*"
-nose = "*"
-
 
 [requires]
 python_version = "3.8"

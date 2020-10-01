@@ -16,7 +16,7 @@ restview:
 
 .PHONY: test-python
 test-python:
-	nosetests --quiet --nocapture --nologcapture tests
+	python -m unittest $(UNITEST_OPTIONS) tests/*.py
 
 .PHONY: test-style
 test-style:
