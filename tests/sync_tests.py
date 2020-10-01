@@ -16,9 +16,15 @@ logger = structlog.get_logger(__name__)
 
 
 class TestSyncClient(TestClientBase):
+    client: SyncHTTPClient
+
     def setUp(self) -> None:
         self.client = SyncHTTPClient("localhost", self.server.port)
         super().setUp()
+
+    def tearDown(self) -> None:
+        self.client.close()
+        super().tearDown()
 
     def test_get_str(self) -> None:
         s = self.client.get("/str", response_type=str)
@@ -154,10 +160,10 @@ class TestSyncClient(TestClientBase):
 class TestSyncSSLClient(TestSSLClientBase):
     def test_disable_ssl_validation(self):
         options = ClientOptions(ssl_verify_cert=False)
-        client = SyncHTTPClient("localhost", self.server.port, scheme="https", options=options)
-        with self.assertWarns(InsecureRequestWarning):
-            s = client.get("/str", response_type=str)
-        self.assertEqual(s, "boo")
+        with SyncHTTPClient("localhost", self.server.port, scheme="https", options=options) as client:
+            with self.assertWarns(InsecureRequestWarning):
+                s = client.get("/str", response_type=str)
+            self.assertEqual(s, "boo")
 
     def test_requires_ssl_validation(self):
         with SyncHTTPClient("localhost", self.server.port, scheme="https") as client:

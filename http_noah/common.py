@@ -1,9 +1,8 @@
 import re
 from contextvars import ContextVar
-from dataclasses import dataclass
-from io import BufferedReader
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, ClassVar, Dict, Optional, Type, TypeVar, Union
+from typing import Any, BinaryIO, ClassVar, Dict, Optional, Type, TypeVar, Union
 
 import structlog
 from pydantic import BaseModel, ValidationError
@@ -32,6 +31,7 @@ class JSONData:
 class UploadFile:
     name: str
     path: Path
+    _file: Optional[BinaryIO] = field(init=False, default=None)
 
     default_mimetype: ClassVar[str] = "application/octet-stream"
 
@@ -39,8 +39,13 @@ class UploadFile:
         if not isinstance(self.path, Path):
             self.path = Path(self.path)
 
-    def prepare(self) -> Dict[str, BufferedReader]:
-        return {self.name: open(self.path, "rb")}
+    def prepare(self) -> Dict[str, BinaryIO]:
+        self._file = open(self.path, "rb")
+        return {self.name: self._file}
+
+    def close(self):
+        if self._file:
+            self._file.close()
 
 
 @dataclass

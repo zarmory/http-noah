@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import mimetypes
-from contextlib import contextmanager
+import warnings
+from contextlib import ExitStack, contextmanager
 from dataclasses import dataclass, field
 from http import HTTPStatus
 from types import TracebackType
 from typing import Any, Callable, Dict, Generator, Optional, Type, cast
-import warnings
 
 import requests
 import structlog
@@ -188,42 +188,45 @@ class SyncHTTPClient:
             req_kwargs.update(self._convert_timeout(_timeout))
         req_kwargs["params"] = query_params
 
-        if isinstance(body, UploadFile):
-            req_kwargs.update(self._body_to_upload_args(cast(UploadFile, body)))
-        else:
-            req_kwargs.update(c.body_to_payload_args(body))
+        with ExitStack() as cleanup:
 
-        # Generally with requests once method returns, all of the response data
-        # is alreardy fetched. Since this method supports **kwargs, it may happen
-        # thas stream=True will be passed in which case the above is not true anymore.
-        # Hence the context manager.
-        # https://2.python-requests.org/en/master/user/advanced/#body-content-workflow
-        with method(url, **req_kwargs) as res:
-            try:
-                res.raise_for_status()
-            except HTTPError as err:
-                err_body = res.text
-                logger.error("Request failed", err=err, err_body=err_body)
-                raise
-
-            if res.status_code == HTTPStatus.NO_CONTENT.value:
-                data = None
-            elif c.json_re.match(res.headers["content-type"]) is not None:
-                data = res.json()
-            elif issubclass(response_type, bytes):
-                # Special cae for checking response_type for bytes since we can't guess
-                # it from the response itself - some data can be treated as both and it
-                # really depends on what our caller expects
-                data = res.content
+            if isinstance(body, UploadFile):
+                req_kwargs.update(cleanup.enter_context(self._body_to_upload_args(cast(UploadFile, body)),),)
             else:
-                data = res.text
+                req_kwargs.update(c.body_to_payload_args(body))
 
-            return c.parse_response_data(data, response_type)
+            # Generally with requests once method returns, all of the response data
+            # is alreardy fetched. Since this method supports **kwargs, it may happen
+            # thas stream=True will be passed in which case the above is not true anymore.
+            # Hence the context manager.
+            # https://2.python-requests.org/en/master/user/advanced/#body-content-workflow
+            with method(url, **req_kwargs) as res:
+                try:
+                    res.raise_for_status()
+                except HTTPError as err:
+                    err_body = res.text
+                    logger.error("Request failed", err=err, err_body=err_body)
+                    raise
 
+                if res.status_code == HTTPStatus.NO_CONTENT.value:
+                    data = None
+                elif c.json_re.match(res.headers["content-type"]) is not None:
+                    data = res.json()
+                elif issubclass(response_type, bytes):
+                    # Special cae for checking response_type for bytes since we can't guess
+                    # it from the response itself - some data can be treated as both and it
+                    # really depends on what our caller expects
+                    data = res.content
+                else:
+                    data = res.text
+
+                return c.parse_response_data(data, response_type)
+
+    @contextmanager
     def _body_to_upload_args(self, upload: UploadFile) -> dict:
         # requests doesn't guess content-type for form file elements while
-        # aiohttp does.  Consequently some servers, e.g. aiohttp, will parse
-        # this form field  just as a string and not as a file which results
+        # aiohttp does. Consequently some servers, e.g. aiohttp, will parse
+        # this form field just as a string and not as a file which results
         # in a different behavious between aiohttp and requests file uploads.
         #
         # Retrofiting aiohttp behaviour to requests
@@ -238,7 +241,9 @@ class SyncHTTPClient:
 
         files[upload.name] = (upload.path.name, fp, mimetype)
 
-        return {"files": files}
+        yield {"files": files}
+
+        upload.close()
 
     def _convert_options(self, options: Optional[ClientOptions] = None) -> dict:
         kwargs: Dict[str, Any] = {}
