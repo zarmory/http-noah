@@ -10,7 +10,7 @@ from tempfile import NamedTemporaryFile
 from typing import Optional
 
 import structlog
-from aiohttp import web
+from aiohttp import BasicAuth, web
 
 from .models import Pet, Pets
 
@@ -23,10 +23,26 @@ async def get_str(request: web.Request):
     return web.Response(text="boo")
 
 
-@routes.get("/api/v1/protected_str")
-async def get_protected_str(request: web.Request):
+@routes.get("/api/v1/bearer_protected_str")
+async def get_bearer_protected_str(request: web.Request):
     logger.info(auth=request.headers.get("Authorization"))
     if request.headers.get("authorization", "") != "Bearer let-the-bear-in":
+        raise web.HTTPForbidden()
+    return web.Response(text="you have made it through")
+
+
+@routes.get("/api/v1/basic_protected_str")
+async def get_basic_protected_str(request: web.Request):
+    logger.info(auth=request.headers.get("Authorization"))
+    auth_info = request.headers.get("authorization", "")
+    if not auth_info:
+        raise web.HTTPForbidden()
+    try:
+        auth = BasicAuth.decode(auth_info)
+    except ValueError:
+        logger.exception(f"Failed to decode auth data {auth_info}")
+        raise web.HTTPBadRequest()
+    if auth.login != "emu" and auth.password != "wars":
         raise web.HTTPForbidden()
     return web.Response(text="you have made it through")
 

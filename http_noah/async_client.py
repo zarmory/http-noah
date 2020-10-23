@@ -14,7 +14,7 @@ import yarl
 
 from . import common as c
 
-from .common import ClientOptions, FormData, JSONData, Timeout, UploadFile  # noqa: F401; Public stuff
+from .common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile  # noqa: F401; Public stuff
 
 logger = structlog.get_logger(__name__)
 
@@ -60,6 +60,11 @@ class AsyncHTTPClient:
         # Using private member, but... otherwise we need
         # to duplicate exactly the same functionality in our code here
         self.session._default_headers["Authorization"] = f"{type} {token}"
+
+    def set_auth_basic(self, auth: BasicAuth) -> None:
+        # Using private member, but... otherwise we need
+        # to duplicate exactly the same functionality in our code here
+        self.session._default_headers["Authorization"] = aiohttp.BasicAuth(auth.username, auth.password).encode()
 
     async def close(self) -> None:
         await self.session.close()

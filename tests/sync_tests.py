@@ -6,7 +6,7 @@ import requests
 import structlog
 from urllib3.exceptions import InsecureRequestWarning
 
-from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
+from http_noah.common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile
 from http_noah.sync_client import ConnectionError, HTTPError, SyncAPIClientBase, SyncHTTPClient, TimeoutError
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
@@ -30,12 +30,20 @@ class TestSyncClient(TestClientBase):
         s = self.client.get("/str", response_type=str)
         self.assertEqual(s, "boo")
 
-    def test_get_protected_str(self) -> None:
+    def test_get_bearer_protected_str(self) -> None:
         with SyncHTTPClient("localhost", self.server.port) as client:
             with self.assertRaisesRegex(HTTPError, "Forbidden"):
-                s = client.get("/protected_str", response_type=str)
+                s = client.get("/bearer_protected_str", response_type=str)
             client.set_auth_token("let-the-bear-in")
-            s = client.get("/protected_str", response_type=str)
+            s = client.get("/bearer_protected_str", response_type=str)
+            self.assertEqual(s, "you have made it through")
+
+    def test_get_basic_protected_str(self) -> None:
+        with SyncHTTPClient("localhost", self.server.port) as client:
+            with self.assertRaisesRegex(HTTPError, "Forbidden"):
+                s = client.get("/basic_protected_str", response_type=str)
+            client.set_auth_basic(BasicAuth("emu", "wars"))
+            s = client.get("/basic_protected_str", response_type=str)
             self.assertEqual(s, "you have made it through")
 
     def test_get_bytes(self) -> None:

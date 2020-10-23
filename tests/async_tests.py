@@ -6,7 +6,7 @@ import aiohttp
 import structlog
 
 from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
-from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
+from http_noah.common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
 from .models import Pet, Pets
@@ -20,12 +20,20 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
             s = await client.get("/str", response_type=str)
             self.assertEqual(s, "boo")
 
-    async def test_get_protected_str(self) -> None:
+    async def test_get_bearer_protected_str(self) -> None:
         async with AsyncHTTPClient("localhost", self.server.port) as client:
             with self.assertRaisesRegex(HTTPError, "Forbidden"):
-                s = await client.get("/protected_str", response_type=str)
+                s = await client.get("/bearer_protected_str", response_type=str)
             client.set_auth_token("let-the-bear-in")
-            s = await client.get("/protected_str", response_type=str)
+            s = await client.get("/bearer_protected_str", response_type=str)
+            self.assertEqual(s, "you have made it through")
+
+    async def test_get_basic_protected_str(self) -> None:
+        async with AsyncHTTPClient("localhost", self.server.port) as client:
+            with self.assertRaisesRegex(HTTPError, "Forbidden"):
+                s = await client.get("/basic_protected_str", response_type=str)
+            client.set_auth_basic(BasicAuth("emu", "wars"))
+            s = await client.get("/basic_protected_str", response_type=str)
             self.assertEqual(s, "you have made it through")
 
     async def test_get_bytes(self) -> None:
