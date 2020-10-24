@@ -410,6 +410,24 @@ done through ``ClientOptions``:
   async with AsyncHTTPClient(host="localhost", port=80, options=options) as client:
       ...
 
+Authentication
+==============
+http-noah support both Basic and Bearer token client authentication.
+These can be set at any time on the existing client:
+
+.. code-block:: python
+
+  async with AsyncHTTPClient("localhost", 8080) as client:
+      # Bearer token
+      client.set_auth_token("my-secret-token")
+      # Or Basic Auth
+      client.set_auth_basic("my-username", "my-password")
+
+It's a deliberate design decision to omit auth parameters from constructor
+because in case of, e.g. bearer token, auth info may not be known in advance
+because one may need to submit a login form first. Hence it's required to be
+able to set auth info at a later stage.
+
 
 ***********
 Development
