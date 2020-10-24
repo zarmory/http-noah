@@ -6,7 +6,7 @@ import aiohttp
 import structlog
 
 from http_noah.async_client import AsyncAPIClientBase, AsyncHTTPClient, ConnectionError, HTTPError, TimeoutError
-from http_noah.common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile
+from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
 from .models import Pet, Pets
@@ -32,7 +32,7 @@ class TestAsyncClient(TestClientBase, unittest.IsolatedAsyncioTestCase):
         async with AsyncHTTPClient("localhost", self.server.port) as client:
             with self.assertRaisesRegex(HTTPError, "Forbidden"):
                 s = await client.get("/basic_protected_str", response_type=str)
-            client.set_auth_basic(BasicAuth("emu", "wars"))
+            client.set_auth_basic("emu", "wars")
             s = await client.get("/basic_protected_str", response_type=str)
             self.assertEqual(s, "you have made it through")
 

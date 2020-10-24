@@ -28,12 +28,6 @@ class JSONData:
 
 
 @dataclass
-class BasicAuth:
-    username: str
-    password: str = field(repr=False)
-
-
-@dataclass
 class UploadFile:
     name: str
     path: Path

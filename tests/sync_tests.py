@@ -6,7 +6,7 @@ import requests
 import structlog
 from urllib3.exceptions import InsecureRequestWarning
 
-from http_noah.common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile
+from http_noah.common import ClientOptions, FormData, JSONData, Timeout, UploadFile
 from http_noah.sync_client import ConnectionError, HTTPError, SyncAPIClientBase, SyncHTTPClient, TimeoutError
 
 from .common import TestClientBase, TestSSLClientBase, get_free_port
@@ -42,7 +42,7 @@ class TestSyncClient(TestClientBase):
         with SyncHTTPClient("localhost", self.server.port) as client:
             with self.assertRaisesRegex(HTTPError, "Forbidden"):
                 s = client.get("/basic_protected_str", response_type=str)
-            client.set_auth_basic(BasicAuth("emu", "wars"))
+            client.set_auth_basic("emu", "wars")
             s = client.get("/basic_protected_str", response_type=str)
             self.assertEqual(s, "you have made it through")
 

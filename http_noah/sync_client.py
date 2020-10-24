@@ -14,7 +14,7 @@ import yarl
 
 from . import common as c
 
-from .common import BasicAuth, ClientOptions, FormData, JSONData, Timeout, UploadFile  # noqa: F401; Public stuff
+from .common import ClientOptions, FormData, JSONData, Timeout, UploadFile  # noqa: F401; Public stuff
 
 logger = structlog.get_logger(__name__)
 
@@ -59,8 +59,8 @@ class SyncHTTPClient:
     def set_auth_token(self, token: str, type: str = "Bearer") -> None:
         self.session.headers["Authorization"] = f"{type} {token}"
 
-    def set_auth_basic(self, auth: BasicAuth) -> None:
-        requests.auth.HTTPBasicAuth(auth.username, auth.password)(self.session)
+    def set_auth_basic(self, username: str, password: str) -> None:
+        requests.auth.HTTPBasicAuth(username, password)(self.session)
 
     def close(self) -> None:
         self.session.close()
